@@ -1,0 +1,8 @@
+{
+  "name": "prototype 2 in circle visualizer",
+  "description": "com",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "prompt": ""
+}

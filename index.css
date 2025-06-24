@@ -1,0 +1,11 @@
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff; /* Set body background to white */
+  margin: 0; /* Remove default body margin */
+  overflow: hidden; /* Prevent scrollbars if visualizer is full screen */
+  height: 100vh;
+  width: 100vw;
+}
