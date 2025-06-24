@@ -17,7 +17,7 @@ export class GdmLiveAudio extends LitElement {
   @state() error = '';
 
   private client: GoogleGenAI;
-  private session: Session;
+  private session: Session | undefined;
   private inputAudioContext = new (window.AudioContext ||
     (window as any).webkitAudioContext)({sampleRate: 16000});
   private outputAudioContext = new (window.AudioContext ||
@@ -25,9 +25,9 @@ export class GdmLiveAudio extends LitElement {
   @state() inputNode = this.inputAudioContext.createGain();
   @state() outputNode = this.outputAudioContext.createGain();
   private nextStartTime = 0;
-  private mediaStream: MediaStream;
-  private sourceNode: AudioBufferSourceNode;
-  private scriptProcessorNode: ScriptProcessorNode;
+  private mediaStream: MediaStream | undefined;
+  private sourceNode: MediaStreamAudioSourceNode | undefined;
+  private scriptProcessorNode: ScriptProcessorNode | undefined;
   private sources = new Set<AudioBufferSourceNode>();
   private systemInstructionsContent: string | null = null;
 
@@ -117,14 +117,12 @@ export class GdmLiveAudio extends LitElement {
       .controls {
         flex-direction: column; /* Stack buttons vertically */
         align-items: center; /* Center buttons in the column */
-        gap: 12px; /* Adjust gap for vertical layout */
-        bottom: 8vh; /* Reposition the column slightly higher */
+        gap: 15px; /* Adjust gap for vertical layout */
+        bottom: 60px; /* Position controls above status */
       }
 
-      /* Button sizes remain 48x48 which is good for touch */
-
       #status {
-        bottom: 2vh; /* Position status text below stacked controls */
+        bottom: 30px; /* Position status text above the footer */
         font-size: 0.8em; /* Make font slightly smaller */
         padding: 0 10px; /* Ensure text doesn't touch edges */
         width: 100%; /* Ensure it spans width for text-align: center */
@@ -326,16 +324,16 @@ export class GdmLiveAudio extends LitElement {
     if (this.scriptProcessorNode) {
         this.scriptProcessorNode.disconnect();
         this.scriptProcessorNode.onaudioprocess = null;
-        this.scriptProcessorNode = null;
+        this.scriptProcessorNode = undefined;
     }
     if (this.sourceNode) {
         this.sourceNode.disconnect();
-        this.sourceNode = null;
+        this.sourceNode = undefined;
     }
     
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach((track) => track.stop());
-      this.mediaStream = null;
+      this.mediaStream = undefined;
     }
 
     this.updateStatus('Recording stopped. Click Start to begin again.');
@@ -361,9 +359,9 @@ export class GdmLiveAudio extends LitElement {
         await this.session.close();
       } catch (e) {
         console.error('Error closing session during reset:', e);
-        this.updateError(`Error closing session: ${e.message}`);
+        this.updateError(`Error closing session: ${(e as Error).message}`);
       }
-      this.session = null;
+      this.session = undefined;
     }
     await this.initSession();
     this.updateStatus('Session reset. Ready for new conversation.');
